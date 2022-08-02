@@ -13,6 +13,7 @@ public class UserService {
 
     Connection connection = new DatabaseManager().getConnection();
     ArrayList<User> userList = new ArrayList<>();
+    ArrayList<String> booksBorrowed = new ArrayList<>();
 
     public void addUserDB(User user) throws SQLException {
         String query = "INSERT INTO users (userName, password, age, email, phoneNumber, specialMarks) " +
@@ -91,6 +92,29 @@ public class UserService {
             userList.add(user);
         }
         return userList;
+    }
+
+    public ArrayList<String > getUserBorrowedBookDataDB(int userId) throws SQLException {
+        String query = "SELECT * FROM bookManagementSystem\n" +
+                "INNER JOIN books\n" +
+                "INNER JOIN users\n" +
+                "ON users.id = bookManagementSystem.userId\n" +
+                "AND books.id = bookManagementSystem.bookId\n" +
+                "WHERE users.id = 1;";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        preparedStatement.setInt(1, userId);
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()){
+            booksBorrowed.add(
+                    resultSet.getInt("bookId"),
+                    resultSet.get
+            );
+        }
+
+        return booksBorrowed;
     }
 }
 

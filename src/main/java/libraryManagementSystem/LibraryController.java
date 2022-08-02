@@ -204,14 +204,18 @@ public class LibraryController {
     }
 
     public void selectBookToBorrow() {
+       int bookBorrowedId;
         try{
-            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your Account ID: "));
+            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your Account ID: ")); // check is id valid for user, book
             int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of book to borrow: "));
+            bookBorrowedId = this.libraryService.checkIfBookIsSameAsBorrowed(userId, bookId);
+            if (bookBorrowedId == 0){
             int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
-            if (bookAmount > 1){ // create separated method
+            if (bookAmount > 1) { // create separated method
                 bookAmount--;
                 this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
                 this.libraryService.addBookToUserAccount(bookId, userId);
+            }
             } else {
                 System.out.println("Selected book is not available. Please select other book");
             }
@@ -229,6 +233,19 @@ public class LibraryController {
                 this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
                 this.libraryService.removeBookFromUserAccount(bookId, userId);
             } catch (Exception exception){
+            JOptionPane.showMessageDialog(frame, exception.getMessage());
+        }
+    }
+
+    public void viewAllBorrowedBooks() {
+        try{
+            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your Account ID: "));
+            this.userService.getUserBorrowedBookDataDB(userId);
+            /*
+            *             for (User usersPrint : this.userService.getUserDataDB(userId)){
+                System.out.println(usersPrint);
+            }*/
+        } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
     }

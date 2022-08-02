@@ -56,4 +56,22 @@ public class LibraryService {
 
         preparedStatement.execute();
     }
+
+    public int checkIfBookIsSameAsBorrowed(int userId, int bookId) throws SQLException {
+        String query = "SELECT id FROM bookManagementSystem WHERE userId = ? AND bookId = ?";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        preparedStatement.setInt(1, userId);
+        preparedStatement.setInt(2, bookId);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()){
+            System.out.println("point 2");
+            return resultSet.getInt("id");
+        }
+      return 0;
+    }
+
 }
