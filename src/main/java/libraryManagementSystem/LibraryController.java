@@ -9,7 +9,6 @@ import user.UserService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.security.Timestamp;
 import java.util.ArrayList;
 
 public class LibraryController {
@@ -34,18 +33,7 @@ public class LibraryController {
 
     public void createBook(){
         try{
-            Book book = new Book();
-            book.setBookName(JOptionPane.showInputDialog(frame, "Insert book Title: "));
-            book.setAuthor(JOptionPane.showInputDialog(frame, "Insert book Author: "));
-            book.setYearPublished(JOptionPane.showInputDialog(frame, "Insert year of book publishing: "));
-            book.setGenre(JOptionPane.showInputDialog(frame, "Insert book Genre: "));
-            book.setDescription(JOptionPane.showInputDialog(frame, "Insert book Description: "));
-            book.setStatus(JOptionPane.showConfirmDialog(frame, "Is book available? ") == JOptionPane.YES_OPTION);
-            book.setBookAmount(Integer.parseInt(JOptionPane.showInputDialog(frame, "Insert amount of books: ")));
-            book.setSpecialMarks(JOptionPane.showInputDialog(frame, "Insert special marks: "));
-
-            this.bookService.addBookDB(book);
-
+            this.bookService.addBookDB(this.CollectAndCreateNewBook());
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
@@ -53,40 +41,37 @@ public class LibraryController {
 
     public void viewBook() {
         try{
-            int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert searched book ID: "));
+            int bookId = collectBookId();
             this.bookService.getSearchedBookDataDB(bookId);
-            for (Book booksPrint : this.bookService.getSearchedBookDataDB(bookId)){
-                System.out.println(booksPrint);
-            }
+
+            String[] bookView = {"ID", "TITLE", "AUTHOR", "YEAR PUBLISHED", "GENRE", "DESCRIPTION", "STATUS",
+                    "BOOK AMOUNT", "SPECIAL MARKS"};
+            DefaultTableModel tableModel = new DefaultTableModel(bookView, 0);
+            this.bookService.getSearchedBookDataDB(bookId).forEach( book -> tableModel.addRow(
+                    new String[]{
+                            String.valueOf(book.getBookId()),
+                            book.getBookName(),
+                            book.getAuthor(),
+                            book.getYearPublished(),
+                            book.getGenre(),
+                            book.getDescription(),
+                            String.valueOf(book.getStatus()),
+                            String.valueOf(book.getBookAmount()),
+                            book.getSpecialMarks()
+                    }
+            ));
+            displayTable(tableModel);
+
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
-
-    /*    String[] bookView = {"ID", "NAME", "AUTHOR", "YEAR PUBLISHED", "GENRE", "DESCRIPTION", "STATUS",
-                            "BOOK AMOUNT", "SPECIAL MARKS"};
-
-        DefaultTableModel tableModel = new DefaultTableModel(bookView, 0);
-                this.books.forEach( book -> tableModel.addRow(
-                        new String[]{
-                                String.valueOf(book.getBookId()),
-                                book.getBookName(),
-                                book.getAuthor(),
-                                book.getYearPublished(),
-                                book.getGenre(),
-                                book.getDescription(),
-                                String.valueOf(book.getStatus()),
-                                String.valueOf(book.getBookAmount()),
-                                book.getSpecialMarks()
-                        }
-                ));
-        displayTable(tableModel);*/
     }
 
     private void displayTable(DefaultTableModel tableModel){
         JTable table = new JTable(tableModel);
 
         frame.setLayout(new BorderLayout());
-        frame.setSize(1500, 600);
+        frame.setSize(1500, 200);
 
         frame.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -95,7 +80,7 @@ public class LibraryController {
 
     public void updateBook() {
         try{
-            int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of book to update: "));
+            int bookId = collectBookId();
             String[] updateOptions = {"Status", "Book Amount"};
             String itemToUpdate = (String) JOptionPane.showInputDialog(
                     this.frame,
@@ -122,7 +107,7 @@ public class LibraryController {
 
     public void deleteBook() {
         try{
-            int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of book to delete"));
+            int bookId = collectBookId();
             bookService.deleteBookFromDB(bookId);
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
@@ -131,16 +116,7 @@ public class LibraryController {
 
     public void collectNewUserData() {
         try{
-            User user = new User();
-            user.setUserName(JOptionPane.showInputDialog("Insert Name Surname: "));
-            user.setPassword(JOptionPane.showInputDialog("Insert chosen password: "));
-            user.setAge(Integer.parseInt(JOptionPane.showInputDialog("Insert your current age: ")));
-            user.setEmail(JOptionPane.showInputDialog("Insert your e-mail: "));
-            user.setPhoneNumber(JOptionPane.showInputDialog("Insert your phone number: "));
-            user.setSpecialMarks(JOptionPane.showInputDialog("Insert additional information if necessary: "));
-
-            this.userService.addUserDB(user);
-
+            this.userService.addUserDB(CollectAndCreateNewUser());
         } catch ( Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
@@ -161,7 +137,7 @@ public class LibraryController {
 
     public void selectUserAccountDataForUpdate() {
         try{
-            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of your account: "));
+            int userId = collectUserId();
             String password = JOptionPane.showInputDialog("Insert your password: ");
 
             String[] updateOptions = {"User Name", "E-mail"};
@@ -193,31 +169,32 @@ public class LibraryController {
 
     public void viewUser() {
         try{
-            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your user ID: "));
+            int userId = collectUserId();
+            this.userService.getUserDataDB(userId);
+
             for (User usersPrint : this.userService.getUserDataDB(userId)){
                 System.out.println(usersPrint);
             }
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
-
     }
 
     public void selectBookToBorrow() {
        int bookBorrowedId;
         try{
-            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your Account ID: ")); // check is id valid for user, book
-            int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of book to borrow: "));
+            int userId = collectUserId();
+            int bookId = collectBookId();
             bookBorrowedId = this.libraryService.checkIfBookIsSameAsBorrowed(userId, bookId);
             if (bookBorrowedId == 0){
             int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
-            if (bookAmount > 1) { // create separated method
+            if (bookAmount > 1) {
                 bookAmount--;
                 this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
                 this.libraryService.addBookToUserAccount(bookId, userId);
             }
             } else {
-                System.out.println("Selected book is not available. Please select other book");
+                System.out.println("Selected book is not available. Please select different book");
             }
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
@@ -226,8 +203,8 @@ public class LibraryController {
 
     public void selectBookToReturn() {
         try{
-            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your Account ID: "));
-            int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of book to return "));
+            int userId = collectUserId();
+            int bookId = collectBookId();
             int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
                 bookAmount++;
                 this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
@@ -239,14 +216,50 @@ public class LibraryController {
 
     public void viewAllBorrowedBooks() {
         try{
-            int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert your Account ID: "));
+            int userId = collectUserId();
             this.userService.getUserBorrowedBookDataDB(userId);
-            /*
-            *             for (User usersPrint : this.userService.getUserDataDB(userId)){
-                System.out.println(usersPrint);
-            }*/
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
+        }
+    }
+
+    public Book CollectAndCreateNewBook(){
+        Book book = new Book();
+        book.setBookName(JOptionPane.showInputDialog(frame, "Insert book Title: "));
+        book.setAuthor(JOptionPane.showInputDialog(frame, "Insert book Author: "));
+        book.setYearPublished(JOptionPane.showInputDialog(frame, "Insert year of book publishing: "));
+        book.setGenre(JOptionPane.showInputDialog(frame, "Insert book Genre: "));
+        book.setDescription(JOptionPane.showInputDialog(frame, "Insert book Description: "));
+        book.setStatus(JOptionPane.showConfirmDialog(frame, "Is book available? ") == JOptionPane.YES_OPTION);
+        book.setBookAmount(Integer.parseInt(JOptionPane.showInputDialog(frame, "Insert amount of books: ")));
+        book.setSpecialMarks(JOptionPane.showInputDialog(frame, "Insert special marks: "));
+        return book;
+    }
+
+    public int collectBookId(){
+        int bookId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of book you are looking for: "));
+        return bookId;
+    }
+
+    public User CollectAndCreateNewUser(){
+        User user = new User();
+        user.setUserName(JOptionPane.showInputDialog("Insert Name Surname: "));
+        user.setPassword(JOptionPane.showInputDialog("Insert chosen password: "));
+        user.setAge(Integer.parseInt(JOptionPane.showInputDialog("Insert your current age: ")));
+        user.setEmail(JOptionPane.showInputDialog("Insert your e-mail: "));
+        user.setPhoneNumber(JOptionPane.showInputDialog("Insert your phone number: "));
+        user.setSpecialMarks(JOptionPane.showInputDialog("Insert additional information if necessary: "));
+        return user;
+    }
+
+    public int collectUserId(){
+        int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of your account: "));
+        return userId;
+    }
+
+    public void decreesBookAmount(int bookAmount) {
+        if (bookAmount > 1) { // create separated method
+            bookAmount--;
         }
     }
 }

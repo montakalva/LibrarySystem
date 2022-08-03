@@ -6,7 +6,7 @@ package libraryManagementSystem;
       -  It should be possible to borrow more than 1 copy of the same book from the library
       -  If a user already borrowed a book, it should not be possible to borrow another copy of the same book
       -  All books should be stored in Database
-        It should be able to see the currently borrowed books by a single user
+      -  It should be able to see the currently borrowed books by a single user
       -  It should be possible return borrowed books
       - All changes made in application should be recorded.
         E.g user borrowed book, 5pm Sunday

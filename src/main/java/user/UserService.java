@@ -1,12 +1,8 @@
 package user;
 
-import book.Book;
 import databaseRepository.DatabaseManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class UserService {
@@ -37,11 +33,14 @@ public class UserService {
         String query = "SELECT userName FROM users WHERE email = ? AND password = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
+        preparedStatement.setString(1, email);
+        preparedStatement.setString(2, password);
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
-        if(resultSet.next()){
-         return userName = resultSet.getString("userName");
+        while (resultSet.next()){
+        userName = resultSet.getString("userName");
+        return userName;
         }
         return "User not found";
     }
@@ -94,13 +93,13 @@ public class UserService {
         return userList;
     }
 
-    public ArrayList<String > getUserBorrowedBookDataDB(int userId) throws SQLException {
-        String query = "SELECT * FROM bookManagementSystem\n" +
+    public void getUserBorrowedBookDataDB(int userId) throws SQLException {
+        String query = "SELECT userName, userId, bookId, bookName, author, borrowedAt FROM bookManagementSystem\n" +
                 "INNER JOIN books\n" +
                 "INNER JOIN users\n" +
                 "ON users.id = bookManagementSystem.userId\n" +
                 "AND books.id = bookManagementSystem.bookId\n" +
-                "WHERE users.id = 1;";
+                "WHERE users.id = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
 
@@ -108,13 +107,17 @@ public class UserService {
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()){
-            booksBorrowed.add(
-                    resultSet.getInt("bookId"),
-                    resultSet.get
-            );
-        }
+            String userName = resultSet.getString("userName");
+            userId = resultSet.getInt("userId");
+            int bookId = resultSet.getInt("bookId");
+            String bookName = resultSet.getString("bookName");
+            String author = resultSet.getString("author");
+            Timestamp borrowedAt = resultSet.getTimestamp("borrowedAt");
 
-        return booksBorrowed;
+            String output = "Borrowed books: \n" +
+                           "User | %s \t | User ID | %d \t Book ID | %d \t Book Title | %s \t Author | %s \t Borrowed At | %s";
+            System.out.println(String.format(output, userName, userId, bookId, bookName, author, borrowedAt));
+        }
     }
 }
 
