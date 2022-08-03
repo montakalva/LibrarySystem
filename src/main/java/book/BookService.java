@@ -2,19 +2,15 @@ package book;
 
 import databaseRepository.DatabaseManager;
 
-import javax.net.ssl.SSLEngineResult;
-import java.security.Timestamp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 public class BookService {
 
     Connection connection = new DatabaseManager().getConnection();
-
 
     public void addBookDB(Book book) throws SQLException {
         String query = "INSERT INTO books (bookName, author, yearPublished, genre, description, status, bookAmount, specialMarks) " +
@@ -59,23 +55,6 @@ public class BookService {
     }
         return books;
 }
-
-
-    private Book createBookFromResultSet(ResultSet resultSet) throws Exception {
-        System.out.println("Point 2");
-        return new Book(
-                resultSet.getInt("id"),
-        resultSet.getString("bookName"),
-        resultSet.getString("author"),
-        resultSet.getString("yearPublished"),
-        resultSet.getString("genre"),
-        resultSet.getString("description"),
-        resultSet.getBoolean("status"),
-        resultSet.getInt("bookAmount"),
-        resultSet.getString("specialMarks")
-        );
-    }
-
 
     public void updateBookStatusDB(boolean status, int bookId)  throws SQLException {
         String query = "UPDATE books SET status = ? WHERE id = ? ";

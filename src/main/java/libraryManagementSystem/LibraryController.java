@@ -17,7 +17,6 @@ public class LibraryController {
     private final BookService bookService;
     private final UserService userService;
     private final LibraryService libraryService;
-    ArrayList<Book> books = new ArrayList<>();
     boolean status;
     int bookAmount;
     String userName;
