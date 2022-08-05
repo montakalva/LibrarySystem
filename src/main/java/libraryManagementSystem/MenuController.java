@@ -28,7 +28,7 @@ public class MenuController {
     }
 
     public void showOptions(){
-        try{
+        try {
             String selectedOption = displayMenuOptions();
             handleUserChoice(selectedOption);
         } catch (Exception exception){
@@ -37,21 +37,73 @@ public class MenuController {
         showOptions();
     }
 
+    public void startApplication(){
+        try{
+            String logInOption = showLoginOptions();
+            handleUserLogInChoice(logInOption);
+        } catch (Exception exception){
+            JOptionPane.showMessageDialog(frame, exception);
+        }
+    }
+
+    public String showLoginOptions() throws Exception {
+        JOptionPane.showMessageDialog(this.frame, "Welcome to Library Management System!");
+
+        String[] appUsingOpportunities = {
+                "Create User Account",
+                "Login at User Account",
+                "Continue without Account",
+                "Quite"
+        };
+
+       String logInOption = (String) JOptionPane.showInputDialog(
+                this.frame,
+                "Select one of options",
+                "LogIn options",
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                appUsingOpportunities,
+                appUsingOpportunities[0]
+                );
+
+       return logInOption;
+    }
+
+    private void handleUserLogInChoice(String logInOption) throws Exception {
+
+        switch (logInOption) {
+            case "Create User Account":
+                libraryController.collectNewUserData();
+                showOptions();
+                break;
+            case "Login at User Account":
+                libraryController.collectLogInData();
+                showOptions();
+                break;
+            case "Continue without Account":
+                libraryController.viewBook();
+                break;
+            case "0. Quite":
+                System.exit(0);
+                break;
+            default:
+                throw new Exception("Please choose valid option");
+        }
+    }
+
     private String displayMenuOptions() {
 
         String[] menuOptions = {
-                "1. Create Book",
-                "2. View Book",
-                "3. Update Book",
-                "4. Delete Book",
-                "5. Create User Account",
-                "6. Login at User Account",
-                "7. View User Account",
-                "8. Update User Account",
-                "9. View my Borrowed book",
-                "10. Borrow Book",
-                "11. Return Book",
-                "0. Quite"};
+                "Create Book",
+                "View Book",
+                "Update Book",
+                "Delete Book",
+                "View User Account",
+                "Update User Account",
+                "View my Borrowed book",
+                "Borrow Book",
+                "Return Book",
+                "Quite"};
 
         String selectedOption = (String) JOptionPane.showInputDialog(
             this.frame,
@@ -68,71 +120,39 @@ public class MenuController {
     private void handleUserChoice(String selectedOption) throws Exception {
 
         switch (selectedOption){
-            case "1. Create Book":
+            case "Create Book":
                libraryController.createBook();
                 break;
-            case "2. View Book":
+            case "View Book":
                 libraryController.viewBook();
                 break;
-            case "3. Update Book":
+            case "Update Book":
                 libraryController.updateBook();
                 break;
-            case "4. Delete Book":
+            case "Delete Book":
                 libraryController.deleteBook();
                 break;
-            case "5. Create User Account":
-                libraryController.collectNewUserData();
-                break;
-            case "6. Login at User Account":
-                libraryController.collectLogInData();
-                break;
-            case "7. View User Account":
+            case "View User Account":
                 libraryController.viewUser();
                 break;
-            case "8. Update User Account":
+            case "Update User Account":
                 libraryController.selectUserAccountDataForUpdate();
                 break;
-            case "9. View my Borrowed book":
+            case "View my Borrowed book":
                 libraryController.viewAllBorrowedBooks();
                 break;
-            case "10. Borrow Book":
+            case "Borrow Book":
                 libraryController.selectBookToBorrow();
                 break;
-            case "11. Return Book":
+            case "Return Book":
                 libraryController.selectBookToReturn();
                 break;
-            case "0. Quite":
+            case "Quite":
                 System.exit(0);
                 break;
             default:
                 throw  new Exception ("Please choose valid option");
         }
     }
-
-
-
-            // BOOKS
-    // add book
-    // view book
-    // update book
-    // delete book
-
-            // USER
-    // create user
-    // log in user
-    // update user
-    // view user
-    // search book
-    // borrow book
-    // return book
-
-            // Library System
-
-    // Create user account
-    // Log in for users
-    // Search for book
-    // see book status
-    // see new books
-
 
 }

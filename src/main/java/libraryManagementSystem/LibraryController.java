@@ -173,6 +173,7 @@ public class LibraryController {
 
             for (User usersPrint : this.userService.getUserDataDB(userId)){
                 System.out.println(usersPrint);
+                break;
             }
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
@@ -261,5 +262,6 @@ public class LibraryController {
             bookAmount--;
         }
     }
+
 
 }
