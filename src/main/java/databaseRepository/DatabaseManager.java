@@ -10,7 +10,6 @@ import java.sql.SQLException;
 public class DatabaseManager {
 
     private Connection connection;
-
     private PropertiesConfiguration databaseProperties = new PropertiesConfiguration();
 
     public DatabaseManager(){

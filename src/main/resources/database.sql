@@ -1,3 +1,4 @@
+
 CREATE DATABASE IF NOT EXISTS JAVA_27_28_LibraryManagementSystem;
 
 USE JAVA_27_28_LibraryManagementSystem;

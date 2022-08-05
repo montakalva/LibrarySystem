@@ -27,6 +27,5 @@ public class Main {
 
         MenuController menuController = new MenuController(libraryController);
         menuController.showOptions();
-
     }
 }

@@ -104,6 +104,7 @@ public class UserService {
         PreparedStatement preparedStatement = connection.prepareStatement(query);
 
         preparedStatement.setInt(1, userId);
+
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()){
