@@ -55,9 +55,10 @@ public class LibraryService {
         preparedStatement.setInt(2, userId);
 
         preparedStatement.execute();
+        System.out.println("Book returned successfully");
     }
 
-    public int checkIfBookIsSameAsBorrowed(int userId, int bookId) throws SQLException {
+    public int checkIfBookIsTheSameAsSelected(int userId, int bookId) throws SQLException {
         String query = "SELECT id FROM bookManagementSystem WHERE userId = ? AND bookId = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
@@ -68,10 +69,8 @@ public class LibraryService {
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()){
-            System.out.println("point 2");
             return resultSet.getInt("id");
         }
       return 0;
     }
-
 }

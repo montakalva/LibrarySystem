@@ -94,7 +94,7 @@ public class UserService {
     }
 
     public void getUserBorrowedBookDataDB(int userId) throws SQLException {
-        String query = "SELECT userName, userId, bookId, bookName, author, borrowedAt FROM bookManagementSystem\n" +
+        String query = "SELECT userName, userId, bookId, bookName, author, actionAt FROM bookManagementSystem\n" +
                 "INNER JOIN books\n" +
                 "INNER JOIN users\n" +
                 "ON users.id = bookManagementSystem.userId\n" +
@@ -107,18 +107,37 @@ public class UserService {
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
-        while (resultSet.next()){
+        if (resultSet.next()){
             String userName = resultSet.getString("userName");
             userId = resultSet.getInt("userId");
             int bookId = resultSet.getInt("bookId");
             String bookName = resultSet.getString("bookName");
             String author = resultSet.getString("author");
-            Timestamp borrowedAt = resultSet.getTimestamp("borrowedAt");
+            Timestamp borrowedAt = resultSet.getTimestamp("actionAt");
 
             String output = "Borrowed books: \n" +
-                           "User | %s \t | User ID | %d \t Book ID | %d \t Book Title | %s \t Author | %s \t Borrowed At | %s";
+                    "User | %s \t | User ID | %d \t Book ID | %d \t Book Title | %s \t Author | %s \t Borrowed At | %s";
             System.out.println(String.format(output, userName, userId, bookId, bookName, author, borrowedAt));
+        } else {
+            System.out.println("There are no borrowed books to show");
         }
+    }
+
+    public int getUsersBorrowedBookAmount(int userId) throws SQLException {
+        int usersBorrowedBookAmount = 0;
+
+        String query = "SELECT COUNT(id) FROM bookManagementSystem WHERE userId = ?";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        preparedStatement.setInt(1, userId);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()){
+            usersBorrowedBookAmount = resultSet.getInt("count(id)");
+        }
+        return usersBorrowedBookAmount;
     }
 }
 

@@ -56,6 +56,33 @@ public class BookService {
         return books;
 }
 
+    public ArrayList<Book> getSearchedBookDataDB() throws SQLException {
+        ArrayList<Book> books = new ArrayList<>();
+
+        String query = "SELECT * FROM books";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        while (resultSet.next()) {
+            Book book = new Book();
+
+            book.setBookId(resultSet.getInt("id"));
+            book.setBookName(resultSet.getString("bookName"));
+            book.setAuthor(resultSet.getString("author"));
+            book.setYearPublished(resultSet.getString("yearPublished"));
+            book.setGenre(resultSet.getString("genre"));
+            book.setDescription(resultSet.getString("description"));
+            book.setStatus(resultSet.getBoolean("status"));
+            book.setBookAmount(resultSet.getInt("bookAmount"));
+            book.setSpecialMarks(resultSet.getString("specialMarks"));
+
+            books.add(book);
+        }
+        return books;
+    }
+
     public void updateBookStatusDB(boolean status, int bookId)  throws SQLException {
         String query = "UPDATE books SET status = ? WHERE id = ? ";
 

@@ -9,7 +9,6 @@ import user.UserService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class LibraryController {
 
@@ -22,6 +21,7 @@ public class LibraryController {
     String userName;
     int userId;
     String email;
+    int bookBorrowedId;
 
     public LibraryController(BookService bookService, UserService userService, LibraryService libraryService){
         this.bookService = bookService;
@@ -32,7 +32,9 @@ public class LibraryController {
 
     public void createBook(){
         try{
-            this.bookService.addBookDB(this.CollectAndCreateNewBook());
+            Book book = this.CollectAndCreateNewBook();
+            this.bookService.addBookDB(book);
+            System.out.println("Book created successfully");
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
@@ -41,10 +43,10 @@ public class LibraryController {
     public void viewBook() {
         try{
             int bookId = collectBookId();
-            this.bookService.getSearchedBookDataDB(bookId);
 
             String[] bookView = {"ID", "TITLE", "AUTHOR", "YEAR PUBLISHED", "GENRE", "DESCRIPTION", "STATUS",
                     "BOOK AMOUNT", "SPECIAL MARKS"};
+
             DefaultTableModel tableModel = new DefaultTableModel(bookView, 0);
             this.bookService.getSearchedBookDataDB(bookId).forEach( book -> tableModel.addRow(
                     new String[]{
@@ -66,6 +68,10 @@ public class LibraryController {
         }
     }
 
+    public void displayBooks(){
+
+    }
+
     private void displayTable(DefaultTableModel tableModel){
         JTable table = new JTable(tableModel);
 
@@ -77,10 +83,39 @@ public class LibraryController {
         frame.setVisible(true);
     }
 
+    public void displayAllLibraryBooks() {
+        try{
+            String[] bookView = {"ID", "TITLE", "AUTHOR", "YEAR PUBLISHED", "GENRE", "DESCRIPTION", "STATUS",
+                    "BOOK AMOUNT", "SPECIAL MARKS"};
+
+            DefaultTableModel tableModel = new DefaultTableModel(bookView, 0);
+            this.bookService.getSearchedBookDataDB().forEach( book -> tableModel.addRow(
+                    new String[]{
+                            String.valueOf(book.getBookId()),
+                            book.getBookName(),
+                            book.getAuthor(),
+                            book.getYearPublished(),
+                            book.getGenre(),
+                            book.getDescription(),
+                            String.valueOf(book.getStatus()),
+                            String.valueOf(book.getBookAmount()),
+                            book.getSpecialMarks()
+                    }
+            ));
+            displayTable(tableModel);
+
+        } catch (Exception exception){
+            JOptionPane.showMessageDialog(frame, exception.getMessage());
+        }
+
+    }
+
     public void updateBook() {
         try{
             int bookId = collectBookId();
+
             String[] updateOptions = {"Status", "Book Amount"};
+
             String itemToUpdate = (String) JOptionPane.showInputDialog(
                     this.frame,
                     "Select update item",
@@ -90,14 +125,17 @@ public class LibraryController {
                     updateOptions,
                     updateOptions[0]
             );
+
             if (itemToUpdate.equals("Status")) {
                 status = JOptionPane.showConfirmDialog(frame, "Is book available? ") == JOptionPane.YES_OPTION;
                 bookService.updateBookStatusDB(status, bookId);
+                System.out.println("Book status updated successfully");
             }
 
             if (itemToUpdate.equals("Book Amount"))
                 bookAmount = Integer.parseInt(JOptionPane.showInputDialog("Insert actual book amount: "));
                 bookService.updateBookAmountDB(bookAmount, bookId);
+                System.out.println("Book amount updated successfully");
 
         }catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
@@ -108,6 +146,7 @@ public class LibraryController {
         try{
             int bookId = collectBookId();
             bookService.deleteBookFromDB(bookId);
+            System.out.println("Book deleted successfully");
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
@@ -115,7 +154,9 @@ public class LibraryController {
 
     public void collectNewUserData() {
         try{
-            this.userService.addUserDB(CollectAndCreateNewUser());
+            User user = CollectAndCreateNewUser();
+            this.userService.addUserDB(user);
+            System.out.println("Your Account created successfully!");
         } catch ( Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
@@ -153,14 +194,14 @@ public class LibraryController {
             if (itemToUpdate.equals("User Name")){
                 userName = JOptionPane.showInputDialog("Insert new Name Surname: ");
                 userService.updateUserNameDB(userName, userId, password);
+                System.out.println("User information updated successfully");
             }
 
             if (itemToUpdate.equals("E-mail")){
                 email = JOptionPane.showInputDialog("Insert new E-mail:");
                 userService.updateUserEmailDB(email, userId, password);
-
+                System.out.println("User information updated successfully");
             }
-
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
@@ -181,20 +222,25 @@ public class LibraryController {
     }
 
     public void selectBookToBorrow() {
-       int bookBorrowedId;
         try{
             int userId = collectUserId();
-            int bookId = collectBookId();
-            bookBorrowedId = this.libraryService.checkIfBookIsSameAsBorrowed(userId, bookId);
-            if (bookBorrowedId == 0){
-            int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
-            if (bookAmount > 1) {
-                bookAmount--;
-                this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
-                this.libraryService.addBookToUserAccount(bookId, userId);
-            }
+            int usersBorrowedBookAmount = userService.getUsersBorrowedBookAmount(userId);
+            if (usersBorrowedBookAmount >= 3){
+                System.out.println("Sorry, you can't borrow more than 2 books at the same time. Enjoy the reading!");
             } else {
-                System.out.println("Selected book is not available. Please select different book");
+                int bookId = collectBookId();
+                bookBorrowedId = this.libraryService.checkIfBookIsTheSameAsSelected(userId, bookId);
+                if (bookBorrowedId == 0){
+                    int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
+                    if (bookAmount > 1) {
+                        bookAmount--;
+                        this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
+                        this.libraryService.addBookToUserAccount(bookId, userId);
+                        System.out.println("Book borrowed successfully");
+                    }
+                } else {
+                    System.out.println("Selected book is not available. Please select different book");
+                }
             }
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
@@ -205,14 +251,22 @@ public class LibraryController {
         try{
             int userId = collectUserId();
             int bookId = collectBookId();
-            int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
+
+            bookBorrowedId = this.libraryService.checkIfBookIsTheSameAsSelected(userId, bookId);
+
+            if (bookBorrowedId == 0){
+                System.out.println("Sorry, we don't have information about book with ID: " + bookId + " , please try again");
+            } else {
+                this.libraryService.removeBookFromUserAccount(bookId, userId);
+                int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
                 bookAmount++;
                 this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
-                this.libraryService.removeBookFromUserAccount(bookId, userId);
+            }
             } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
     }
+
 
     public void viewAllBorrowedBooks() {
         try{
@@ -256,12 +310,5 @@ public class LibraryController {
         int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of your account: "));
         return userId;
     }
-
-    public void decreesBookAmount(int bookAmount) {
-        if (bookAmount > 1) { // create separated method
-            bookAmount--;
-        }
-    }
-
 
 }

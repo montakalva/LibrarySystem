@@ -13,9 +13,6 @@ package libraryManagementSystem;
         Username returned book, 2 am Tuesday*/
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.stream.Stream;
-
 
 public class MenuController {
 
@@ -25,6 +22,15 @@ public class MenuController {
     public MenuController (LibraryController libraryController){
         this.libraryController = libraryController;
         this.frame = libraryController.frame;
+    }
+
+    public void startApplication(){
+        try{
+            String logInOption = showLoginOptions();
+            handleUserLogInChoice(logInOption);
+        } catch (Exception exception){
+            JOptionPane.showMessageDialog(frame, exception);
+        }
     }
 
     public void showOptions(){
@@ -37,19 +43,10 @@ public class MenuController {
         showOptions();
     }
 
-    public void startApplication(){
-        try{
-            String logInOption = showLoginOptions();
-            handleUserLogInChoice(logInOption);
-        } catch (Exception exception){
-            JOptionPane.showMessageDialog(frame, exception);
-        }
-    }
-
-    public String showLoginOptions() throws Exception {
+    public String showLoginOptions() {
         JOptionPane.showMessageDialog(this.frame, "Welcome to Library Management System!");
 
-        String[] appUsingOpportunities = {
+        String[] appAccessOptions = {
                 "Create User Account",
                 "Login at User Account",
                 "Continue without Account",
@@ -59,11 +56,11 @@ public class MenuController {
        String logInOption = (String) JOptionPane.showInputDialog(
                 this.frame,
                 "Select one of options",
-                "LogIn options",
+                "Login options",
                 JOptionPane.QUESTION_MESSAGE,
                 null,
-                appUsingOpportunities,
-                appUsingOpportunities[0]
+                appAccessOptions,
+                appAccessOptions[0]
                 );
 
        return logInOption;
@@ -81,7 +78,7 @@ public class MenuController {
                 showOptions();
                 break;
             case "Continue without Account":
-                libraryController.viewBook();
+                libraryController.displayAllLibraryBooks();
                 break;
             case "0. Quite":
                 System.exit(0);
@@ -96,14 +93,16 @@ public class MenuController {
         String[] menuOptions = {
                 "Create Book",
                 "View Book",
+                "View All Library books",
                 "Update Book",
                 "Delete Book",
-                "View User Account",
-                "Update User Account",
-                "View my Borrowed book",
+                "View my Account",
+                "Update my Account",
+                "View my Borrowed books",
                 "Borrow Book",
                 "Return Book",
-                "Quite"};
+                "Quite"
+        };
 
         String selectedOption = (String) JOptionPane.showInputDialog(
             this.frame,
@@ -126,19 +125,22 @@ public class MenuController {
             case "View Book":
                 libraryController.viewBook();
                 break;
+            case "View All Library books":
+                libraryController.displayAllLibraryBooks();
+                break;
             case "Update Book":
                 libraryController.updateBook();
                 break;
             case "Delete Book":
                 libraryController.deleteBook();
                 break;
-            case "View User Account":
+            case "View my Account":
                 libraryController.viewUser();
                 break;
-            case "Update User Account":
+            case "Update my Account":
                 libraryController.selectUserAccountDataForUpdate();
                 break;
-            case "View my Borrowed book":
+            case "View my Borrowed books":
                 libraryController.viewAllBorrowedBooks();
                 break;
             case "Borrow Book":
@@ -154,5 +156,4 @@ public class MenuController {
                 throw  new Exception ("Please choose valid option");
         }
     }
-
 }
