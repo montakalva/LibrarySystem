@@ -1,4 +1,3 @@
-
 CREATE DATABASE IF NOT EXISTS JAVA_27_28_LibraryManagementSystem;
 
 USE JAVA_27_28_LibraryManagementSystem;
@@ -10,7 +9,7 @@ CREATE TABLE IF NOT EXISTS books (
     yearPublished varchar (20),
     genre varchar (100),
     description text,
-    status varchar (100) not null,
+    status BOOLEAN not null,
     bookAmount int not null,
     specialMarks text,
     PRIMARY KEY (id)
@@ -29,8 +28,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS bookManagementSystem (
     id int not null auto_increment,
-    borrowedAt timestamp not null,
-    returnedAt timestamp,
+    actionAt timestamp DEFAULT CURRENT_TIMESTAMP,
     bookId int,
     userId int,
     PRIMARY KEY (id),

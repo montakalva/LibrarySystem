@@ -9,14 +9,12 @@ public class UserService {
 
     Connection connection = new DatabaseManager().getConnection();
     ArrayList<User> userList = new ArrayList<>();
-    ArrayList<String> booksBorrowed = new ArrayList<>();
 
     public void addUserDB(User user) throws SQLException {
         String query = "INSERT INTO users (userName, password, age, email, phoneNumber, specialMarks) " +
                         "VALUES (?, ?, ?, ?, ?, ?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setString(1, user.getUserName());
         preparedStatement.setString(2, user.getPassword());
         preparedStatement.setInt(3, user.getAge());
@@ -25,12 +23,11 @@ public class UserService {
         preparedStatement.setString(6, user.getSpecialMarks());
 
         preparedStatement.execute();
-
     }
 
-    public String receiveUserLogInDataDB(String email, String password) throws Exception {
-        String userName;
-        String query = "SELECT userName FROM users WHERE email = ? AND password = ?";
+    public int receiveUserLogInDataDB(String email, String password) throws Exception {
+        int userId;
+        String query = "SELECT id FROM users WHERE email = ? AND password = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         preparedStatement.setString(1, email);
@@ -38,18 +35,18 @@ public class UserService {
 
         ResultSet resultSet = preparedStatement.executeQuery();
 
-        while (resultSet.next()){
-        userName = resultSet.getString("userName");
-        return userName;
+        if (resultSet.next()){
+        userId = resultSet.getInt("id");
+        return userId;
+        } else {
+            return 0;
         }
-        return "User not found";
     }
 
     public void updateUserNameDB(String userName, int userId, String password) throws SQLException {
         String query = "UPDATE users SET userName = ? WHERE id = ? AND password = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setString(1, userName);
         preparedStatement.setInt(2, userId);
         preparedStatement.setString(3, password);
@@ -61,7 +58,6 @@ public class UserService {
         String query = "UPDATE users SET email = ? WHERE id = ? AND password = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setString(1, newEmail);
         preparedStatement.setInt(2, userId);
         preparedStatement.setString(3, password);
@@ -94,7 +90,7 @@ public class UserService {
     }
 
     public void getUserBorrowedBookDataDB(int userId) throws SQLException {
-        String query = "SELECT userName, userId, bookId, bookName, author, actionAt FROM bookManagementSystem\n" +
+        String query = "SELECT userName, userId, bookId, bookName, author, DATE_FORMAT(actionAt, '%I%p %W') AS actionAt FROM bookManagementSystem\n" +
                 "INNER JOIN books\n" +
                 "INNER JOIN users\n" +
                 "ON users.id = bookManagementSystem.userId\n" +
@@ -102,24 +98,20 @@ public class UserService {
                 "WHERE users.id = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, userId);
 
         ResultSet resultSet = preparedStatement.executeQuery();
+        System.out.println("Borrowed books: \n" );
 
-        if (resultSet.next()){
+        while (resultSet.next()){
             String userName = resultSet.getString("userName");
             userId = resultSet.getInt("userId");
             int bookId = resultSet.getInt("bookId");
             String bookName = resultSet.getString("bookName");
             String author = resultSet.getString("author");
-            Timestamp borrowedAt = resultSet.getTimestamp("actionAt");
-
-            String output = "Borrowed books: \n" +
-                    "User | %s \t | User ID | %d \t Book ID | %d \t Book Title | %s \t Author | %s \t Borrowed At | %s";
+            String borrowedAt = resultSet.getString("actionAt");
+            String output = "User | %s \t | User ID | %d \t Book ID | %d \t Book Title | %s \t Author | %s \t Borrowed At | %s";
             System.out.println(String.format(output, userName, userId, bookId, bookName, author, borrowedAt));
-        } else {
-            System.out.println("There are no borrowed books to show");
         }
     }
 
@@ -129,7 +121,6 @@ public class UserService {
         String query = "SELECT COUNT(id) FROM bookManagementSystem WHERE userId = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, userId);
 
         ResultSet resultSet = preparedStatement.executeQuery();
@@ -138,6 +129,25 @@ public class UserService {
             usersBorrowedBookAmount = resultSet.getInt("count(id)");
         }
         return usersBorrowedBookAmount;
+    }
+
+    public int returnNewUserID(String email, String password) throws SQLException {
+        int userId;
+
+        String query = "SELECT id FROM users WHERE email = ? and password = ?";
+
+        PreparedStatement preparedStatement = connection.prepareStatement(query);
+
+        preparedStatement.setString(1, email);
+        preparedStatement.setString(2, password);
+
+        ResultSet resultSet = preparedStatement.executeQuery();
+
+        if (resultSet.next()){
+           return userId = resultSet.getInt("id");
+        } else {
+            return 0;
+        }
     }
 }
 

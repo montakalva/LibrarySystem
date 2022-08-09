@@ -10,23 +10,7 @@ public class User {
     private String phoneNumber;
     private String specialMarks;
 
-    public User(int userId, String userName, String password, int age, String email, String phoneNumber, String specialMarks) {
-        this.userId = userId;
-        this.userName = userName;
-        this.password = password;
-        this.age = age;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.specialMarks = specialMarks;
-    }
-
-    public User() {
-
-    }
-
-    public int getUserId() {
-        return userId;
-    }
+    public User() {}
 
     public void setUserId(int userId) {
         this.userId = userId;
@@ -82,12 +66,12 @@ public class User {
 
     @Override
     public String toString() {
-        return "UserId=" + userId +
-                ", userName='" + userName + '\'' +
-                ", password='" + password + '\'' +
-                ", age=" + age +
-                ", email='" + email + '\'' +
-                ", phoneNumber='" + phoneNumber + '\'' +
-                ", specialMarks='" + specialMarks;
+        return "UserId | " + userId +
+                "\t userName | " + userName +
+                "\t password | " + password +
+                "\t age | " + age +
+                "\t email | " + email +
+                "\t phoneNumber | " + phoneNumber +
+                "\t specialMarks | " + specialMarks;
     }
 }

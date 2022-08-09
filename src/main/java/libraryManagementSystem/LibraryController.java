@@ -68,10 +68,6 @@ public class LibraryController {
         }
     }
 
-    public void displayBooks(){
-
-    }
-
     private void displayTable(DefaultTableModel tableModel){
         JTable table = new JTable(tableModel);
 
@@ -107,7 +103,6 @@ public class LibraryController {
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
-
     }
 
     public void updateBook() {
@@ -152,32 +147,46 @@ public class LibraryController {
         }
     }
 
-    public void collectNewUserData() {
+    public int collectNewUserData() {
         try{
             User user = CollectAndCreateNewUser();
             this.userService.addUserDB(user);
-            System.out.println("Your Account created successfully!");
+            int userId = this.userService.returnNewUserID(user.getEmail(), user.getPassword());
+            if(userId <=0){
+                System.out.println("Please insert valid data");
+                collectNewUserData();
+            } else {
+                System.out.println("Your Account created successfully!");
+                return userId;
+            }
         } catch ( Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
+        return userId;
     }
 
-    public void collectLogInData() {
+    public int collectLogInData() {
         try{
             String email = JOptionPane.showInputDialog("Insert your e-mail: ");
             String password = JOptionPane.showInputDialog("Insert your password: ");
 
-            String userName = this.userService.receiveUserLogInDataDB(email, password);
-            System.out.println("Welcome to Library Management System, " + userName);
+            int userId = this.userService.receiveUserLogInDataDB(email, password);
+            if(userId <= 0){
+                System.out.println("Please insert valid login data");
+                collectLogInData();
+            } else {
+                System.out.println("Welcome to Library Management System!");
+                return userId;
+            }
 
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
         }
+        return userId;
     }
 
-    public void selectUserAccountDataForUpdate() {
+    public void selectUserAccountDataForUpdate(int userId) {
         try{
-            int userId = collectUserId();
             String password = JOptionPane.showInputDialog("Insert your password: ");
 
             String[] updateOptions = {"User Name", "E-mail"};
@@ -207,9 +216,8 @@ public class LibraryController {
         }
     }
 
-    public void viewUser() {
+    public void viewUser(int userId) {
         try{
-            int userId = collectUserId();
             this.userService.getUserDataDB(userId);
 
             for (User usersPrint : this.userService.getUserDataDB(userId)){
@@ -221,22 +229,21 @@ public class LibraryController {
         }
     }
 
-    public void selectBookToBorrow() {
+    public void selectBookToBorrow(int userId) {
         try{
-            int userId = collectUserId();
             int usersBorrowedBookAmount = userService.getUsersBorrowedBookAmount(userId);
-            if (usersBorrowedBookAmount >= 3){
+            if (usersBorrowedBookAmount >= 2){
                 System.out.println("Sorry, you can't borrow more than 2 books at the same time. Enjoy the reading!");
             } else {
                 int bookId = collectBookId();
                 bookBorrowedId = this.libraryService.checkIfBookIsTheSameAsSelected(userId, bookId);
                 if (bookBorrowedId == 0){
                     int bookAmount = this.libraryService.receiveBookAmountDB(bookId);
-                    if (bookAmount > 1) {
+                    if (bookAmount >= 1) {
                         bookAmount--;
                         this.libraryService.updateBorrowedBookDataDB(bookAmount, bookId);
                         this.libraryService.addBookToUserAccount(bookId, userId);
-                        System.out.println("Book borrowed successfully");
+                        this.libraryService.confirmationBookBorrowed(bookId, userId);
                     }
                 } else {
                     System.out.println("Selected book is not available. Please select different book");
@@ -247,13 +254,10 @@ public class LibraryController {
         }
     }
 
-    public void selectBookToReturn() {
+    public void selectBookToReturn(int userId) {
         try{
-            int userId = collectUserId();
             int bookId = collectBookId();
-
             bookBorrowedId = this.libraryService.checkIfBookIsTheSameAsSelected(userId, bookId);
-
             if (bookBorrowedId == 0){
                 System.out.println("Sorry, we don't have information about book with ID: " + bookId + " , please try again");
             } else {
@@ -267,10 +271,8 @@ public class LibraryController {
         }
     }
 
-
-    public void viewAllBorrowedBooks() {
+    public void viewAllBorrowedBooks(int userId) {
         try{
-            int userId = collectUserId();
             this.userService.getUserBorrowedBookDataDB(userId);
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception.getMessage());
@@ -305,10 +307,4 @@ public class LibraryController {
         user.setSpecialMarks(JOptionPane.showInputDialog("Insert additional information if necessary: "));
         return user;
     }
-
-    public int collectUserId(){
-        int userId = Integer.parseInt(JOptionPane.showInputDialog("Insert ID of your account: "));
-        return userId;
-    }
-
 }

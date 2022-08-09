@@ -62,7 +62,6 @@ public class BookService {
         String query = "SELECT * FROM books";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         ResultSet resultSet = preparedStatement.executeQuery();
 
         while (resultSet.next()) {
@@ -87,7 +86,6 @@ public class BookService {
         String query = "UPDATE books SET status = ? WHERE id = ? ";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setBoolean(1, status);
         preparedStatement.setInt(2, bookId);
 
@@ -99,7 +97,6 @@ public class BookService {
         String query = "UPDATE books SET bookAmount = ? WHERE id = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, bookAmount);
         preparedStatement.setInt(2, bookId);
 
@@ -110,13 +107,11 @@ public class BookService {
         String query = "DELETE FROM books WHERE id = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, bookId);
 
         if (preparedStatement.executeUpdate() == 0) {
             throw new SQLException("Book with ID: " + bookId + " not found");
         }
     }
-
 }
 

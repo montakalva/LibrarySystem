@@ -1,6 +1,5 @@
 package databaseRepository;
 
-import java.lang.ref.PhantomReference;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,7 +14,6 @@ public class LibraryService {
         String query = "UPDATE books SET bookAmount = ? WHERE id = ?";
 
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-
             preparedStatement.setInt(1, bookAmount);
             preparedStatement.setInt(2, bookId);
 
@@ -39,7 +37,6 @@ public class LibraryService {
         String query = "INSERT INTO bookManagementSystem (bookId, userId) VALUES (?, ?)";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, bookId);
         preparedStatement.setInt(2, userId);
 
@@ -50,7 +47,6 @@ public class LibraryService {
         String query = "DELETE FROM bookManagementSystem WHERE bookId = ? AND userId = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, bookId);
         preparedStatement.setInt(2, userId);
 
@@ -62,7 +58,6 @@ public class LibraryService {
         String query = "SELECT id FROM bookManagementSystem WHERE userId = ? AND bookId = ?";
 
         PreparedStatement preparedStatement = connection.prepareStatement(query);
-
         preparedStatement.setInt(1, userId);
         preparedStatement.setInt(2, bookId);
 
@@ -73,4 +68,22 @@ public class LibraryService {
         }
       return 0;
     }
+
+    public void confirmationBookBorrowed(int bookId, int userId) throws SQLException {
+            String query = "SELECT DATE_FORMAT(actionAt, '%I%p %W') AS actionAt FROM bookManagementSystem WHERE bookId = ? AND userId = ?";
+
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, bookId);
+            preparedStatement.setInt(2, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()){
+                String borrowedAt = resultSet.getString("actionAt");
+                String output = "You borrowed book successfully, %s";
+                System.out.println(String.format(output, borrowedAt));
+
+        }
+    }
 }
+

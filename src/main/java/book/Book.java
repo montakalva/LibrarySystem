@@ -1,8 +1,5 @@
 package book;
 
-import java.security.PrivateKey;
-import java.security.Timestamp;
-
 public class Book {
 
     private int bookId;
@@ -14,36 +11,8 @@ public class Book {
     private boolean status;
     private int bookAmount;
     private String specialMarks;
-    private Timestamp borrowedAt;
-    private Timestamp returnedAt;
-
-    public Book(int bookId, String bookName, String author, String yearPublished, String genre, String description,
-                boolean status, int bookAmount, String specialMarks, Timestamp borrowedAt, Timestamp returnedAt) {
-        this.bookId = bookId;
-        this.bookName = bookName;
-        this.author = author;
-        this.yearPublished = yearPublished;
-        this.genre = genre;
-        this.description = description;
-        this.status = status;
-        this.bookAmount = bookAmount;
-        this.specialMarks = specialMarks;
-        this.borrowedAt = borrowedAt;
-        this.returnedAt = returnedAt;
-    }
-
-    public Book(int bookId, String bookName, String author, String yearPublished, String genre, String description,
-                boolean status, int bookAmount, String specialMarks) {
-        this.bookId = bookId;
-        this.bookName = bookName;
-        this.author = author;
-        this.yearPublished = yearPublished;
-        this.genre = genre;
-        this.description = description;
-        this.status = status;
-        this.bookAmount = bookAmount;
-        this.specialMarks = specialMarks;
-    }
+    private String borrowedAt;
+    private String returnedAt;
 
     public Book() {
     }
@@ -120,23 +89,6 @@ public class Book {
         this.specialMarks = specialMarks;
     }
 
-    public Timestamp getBorrowedAt() {
-        return borrowedAt;
-    }
-
-    public void setBorrowedAt(Timestamp borrowedAt) {
-        this.borrowedAt = borrowedAt;
-    }
-
-    public Timestamp getReturnedAt() {
-        return returnedAt;
-    }
-
-    public void setReturnedAt(Timestamp returnedAt) {
-        this.returnedAt = returnedAt;
-    }
-
-
     @Override
     public String toString() {
         return "BookId=" + bookId +
@@ -148,7 +100,7 @@ public class Book {
                 ", status='" + status + '\'' +
                 ", bookAmount='" + bookAmount + '\'' +
                 ", specialMarks='" + specialMarks + '\'' +
-                ", borrowedAt=" + borrowedAt +
-                ", returnedAt=" + returnedAt;
+                ", borrowedAt=" + borrowedAt;
+
     }
 }

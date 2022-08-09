@@ -1,16 +1,4 @@
 package libraryManagementSystem;
-/*
-*   A library management system
-      -  It should be possible to view, add, delete, update and remove books
-      -  It should be possible to borrow books from library,
-      -  It should be possible to borrow more than 1 copy of the same book from the library
-      -  If a user already borrowed a book, it should not be possible to borrow another copy of the same book
-      -  All books should be stored in Database
-      -  It should be able to see the currently borrowed books by a single user
-      -  It should be possible return borrowed books
-      -  All changes made in application should be recorded.
-        E.g user borrowed book, 5pm Sunday
-        Username returned book, 2 am Tuesday*/
 
 import javax.swing.*;
 
@@ -33,14 +21,14 @@ public class MenuController {
         }
     }
 
-    public void showOptions(){
+    public void showOptions(int userId){
         try {
             String selectedOption = displayMenuOptions();
-            handleUserChoice(selectedOption);
+            handleUserChoice(selectedOption, userId);
         } catch (Exception exception){
             JOptionPane.showMessageDialog(frame, exception);
         }
-        showOptions();
+        showOptions(userId);
     }
 
     public String showLoginOptions() {
@@ -70,12 +58,12 @@ public class MenuController {
 
         switch (logInOption) {
             case "Create User Account":
-                libraryController.collectNewUserData();
-                showOptions();
+                int userId = libraryController.collectNewUserData();
+                showOptions(userId);
                 break;
             case "Login at User Account":
-                libraryController.collectLogInData();
-                showOptions();
+                userId = libraryController.collectLogInData();
+                showOptions(userId);
                 break;
             case "Continue without Account":
                 libraryController.displayAllLibraryBooks();
@@ -116,7 +104,7 @@ public class MenuController {
         return selectedOption;
     }
 
-    private void handleUserChoice(String selectedOption) throws Exception {
+    private void handleUserChoice(String selectedOption, int userId) throws Exception {
 
         switch (selectedOption){
             case "Create Book":
@@ -135,19 +123,19 @@ public class MenuController {
                 libraryController.deleteBook();
                 break;
             case "View my Account":
-                libraryController.viewUser();
+                libraryController.viewUser(userId);
                 break;
             case "Update my Account":
-                libraryController.selectUserAccountDataForUpdate();
+                libraryController.selectUserAccountDataForUpdate(userId);
                 break;
             case "View my Borrowed books":
-                libraryController.viewAllBorrowedBooks();
+                libraryController.viewAllBorrowedBooks(userId);
                 break;
             case "Borrow Book":
-                libraryController.selectBookToBorrow();
+                libraryController.selectBookToBorrow(userId);
                 break;
             case "Return Book":
-                libraryController.selectBookToReturn();
+                libraryController.selectBookToReturn(userId);
                 break;
             case "Quite":
                 System.exit(0);
